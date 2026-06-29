@@ -1,27 +1,37 @@
 from rest_framework import serializers
-from .models import Products
+from .models import Products, Category
+
+class CategorySerializer(serializers.ModelSerializer):
+    """
+    Serializer to map the Category model into JSON format.
+    """
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'description']
 
 class ProductSerializer(serializers.ModelSerializer):
     """
-    Serializer to map the Products model instance into JSON format
-    and handle data validation for creation and updates.
+    Serializer to map the Products model and handle data validation.
+    Includes nested category information for read operations.
     """
+    category_detail = CategorySerializer(source='category', read_only=True)
+    
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), 
+        write_only=True, 
+        required=False
+    )
+
     class Meta:
         model = Products
-        fields = ['id', 'name', 'description', 'price', 'stock']
+        fields = ['id', 'name', 'description', 'price', 'stock', 'category', 'category_detail']
 
     def validate_price(self, value):
-        """
-        Validates that the product price is greater than zero.
-        """
         if value <= 0:
             raise serializers.ValidationError("The price must be greater than zero.")
         return value
 
     def validate_stock(self, value):
-        """
-        Validates that the stock quantity is not negative.
-        """
         if value < 0:
-            raise serializers.ValidationError("The stock quantity cannot be negative.")
+            raise serializers.ValidationError("The stock levels cannot be negative.")
         return value

@@ -1,8 +1,15 @@
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Products
-from .serializers import ProductSerializer
+from .models import Products, Category
+from .serializers import ProductSerializer, CategorySerializer
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    A ViewSet for viewing and editing product categories.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
     """
@@ -11,15 +18,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     queryset = Products.objects.all()
     serializer_class = ProductSerializer
-    
-    # Configure filtering backends specifically for this view
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    
-    # Exact match filters
-    filterset_fields = ['stock']
-    
-    # Text search fields (maps to HTTP query param '?search=')
+    filterset_fields = ['stock', 'category']
     search_fields = ['name', 'description']
-    
-    # Order parameters (maps to HTTP query param '?ordering=')
     ordering_fields = ['price', 'stock']
