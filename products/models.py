@@ -31,7 +31,9 @@ class Products(models.Model):
         null=True, 
         blank=True
     )
-
+    class Meta:
+        ordering = ['id']
+        
     def __str__(self):
         """
         Returns a readable string representation of the product instance.
