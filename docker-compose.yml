@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # Serviço 1: O nosso banco de dados relacional
+  db:
+    image: postgres:16-alpine
+    container_name: ecommerce_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=ecommerce_prod
+      - POSTGRES_USER=alexandre_admin
+      - POSTGRES_PASSWORD=senha_secreta_db
+    ports:
+      - "5433:5432"
+
+  # Serviço 2: A nossa aplicação Django API
+  web:
+    build: .
+    container_name: ecommerce_api
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8000"
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-docker-key-test-2026
+      - DB_NAME=ecommerce_prod
+      - DB_USER=alexandre_admin
+      - DB_PASSWORD=senha_secreta_db
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
