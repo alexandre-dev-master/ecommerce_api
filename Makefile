@@ -7,7 +7,7 @@ down:
 	docker compose down
 
 test:
-	docker compose exec web python manage.py test
+	docker compose exec web pytest
 
 migrate:
 	docker compose exec web python manage.py makemigrations
