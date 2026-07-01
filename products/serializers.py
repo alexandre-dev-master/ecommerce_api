@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Products, Category
 
@@ -35,3 +36,23 @@ class ProductSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError("The stock levels cannot be negative.")
         return value
+    
+class RegisterSerializer(serializers.ModelSerializer):
+    """
+    Serializer to handle user registration.
+    Ensures the password is securely hashed before saving.
+    """
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+    def create(self, validated_data):
+        # The create_user method automatically hashes the password
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data['password']
+        )
+        return user
