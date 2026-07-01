@@ -1,9 +1,11 @@
+from rest_framework.authentication import SessionAuthentication
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Products, Category
 from .permissions import IsAdminOrReadOnly
 from .serializers import ProductSerializer, CategorySerializer, RegisterSerializer
@@ -16,7 +18,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
-    
+    authentication_classes = [JWTAuthentication, SessionAuthentication]
 
 class ProductViewSet(viewsets.ModelViewSet):
     """
@@ -31,6 +33,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'stock']
     permission_classes = [IsAdminOrReadOnly]
+    authentication_classes = [JWTAuthentication, SessionAuthentication]     
 
 
 class RegisterView(APIView):
