@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Products, Category
 from .serializers import ProductSerializer, CategorySerializer
@@ -22,3 +23,5 @@ class ProductViewSet(viewsets.ModelViewSet):
     filterset_fields = ['stock', 'category']
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'stock']
+    
+    permission_classes = [IsAuthenticatedOrReadOnly]

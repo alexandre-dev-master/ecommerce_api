@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.contrib.auth.models import User
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from rest_framework.test import APITestCase
 from .models import Products
@@ -28,21 +29,27 @@ class ProductAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_anonymous_user_cannot_create_product(self):
-        """Validates that anonymous users are blocked from creating products (HTTP 403)."""
+        """Validates that anonymous users are blocked from creating products (HTTP 401)."""
         data = {"name": "Mouse Teste", "price": "50.00", "stock": 5, "description": "Sem fio"}
         response = self.client.post(self.list_url, data)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_authenticated_user_can_create_product(self):
-        """Validates that a logged-in user can successfully create a product."""
-        self.client.login(username='testuser', password='password123')
+        """Validates that a logged-in user can successfully create a product using JWT."""
+        # Generate a token for the user created in the setup
+        refresh = RefreshToken.for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+        
         data = {"name": "Mouse Teste", "price": "50.00", "stock": 5, "description": "Sem fio"}
         response = self.client.post(self.list_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_serializer_validation_invalid_price(self):
         """Validates that the price validator blocks values equal to or less than zero."""
-        self.client.login(username='testuser', password='password123')
+        # Gera o token para o usuário criado no setUp
+        refresh = RefreshToken.for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+        
         data = {"name": "Item Invalido", "price": "0.00", "stock": 5, "description": "Erro esperado"}
         response = self.client.post(self.list_url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
