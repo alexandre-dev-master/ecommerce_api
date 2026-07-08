@@ -10,6 +10,8 @@ from .models import Products, Category
 from .permissions import IsAdminOrReadOnly
 from .serializers import ProductSerializer, CategorySerializer, RegisterSerializer
 
+
+
 class CategoryViewSet(viewsets.ModelViewSet):
     """
     A ViewSet for viewing and editing product categories.
