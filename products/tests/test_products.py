@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .models import Products, Category
+from products.models import Products, Category
 
 class ProductAPITests(APITestCase):
 
